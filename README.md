@@ -14,8 +14,7 @@ Introducing healTherapist! It is a web app that detects the facial expression of
 - Our team faced difficulties in communicating with each other due to time zone differences. With the time zone difference, some of us had to compromise by sacrificing our sleeping schedules.
 - In addition, sometimes the internet connection sucks. It’s difficult to be working on a project during a call with a bad internet connection.
 - However, we did not want time zone differences, sleep deprivation and a bad internet connection to hold us back from participating at DefHacks 2020.
-- Further, implementing machine learning into our project was something that stopped us in our tracks. We weren't quite sure how to get started or where to even look.
-- But we pushed through and were able to create something that excited us.
+- Further, implementing machine learning into our project was something that stopped us in our tracks. We weren't quite sure how to get started or where to even look, but we pushed through and were able to create something that excited us.
 
 ## Accomplishments that we're proud of
 - Completing a project
