@@ -68,25 +68,22 @@ def detection():
         new_face = []
 
         for det in detected_face :
-            #Region dans laquelle la face est détectée
+
             x, y, w, h = det
-            #X et y correspondent à la conversion en gris par gray, et w, h correspondent à la hauteur/largeur
+
 
             #Offset coefficient, np.floor takes the lowest integer (delete border of the image)
             horizontal_offset = np.int(np.floor(offset_coefficients[0] * w))
             vertical_offset = np.int(np.floor(offset_coefficients[1] * h))
 
-            #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            #gray transforme l'image
             extracted_face = gray[y+vertical_offset:y+h, x+horizontal_offset:x-horizontal_offset+w]
 
-            #Zoom sur la face extraite
             new_extracted_face = zoom(extracted_face, (shape_x / extracted_face.shape[0],shape_y / extracted_face.shape[1]))
-            #cast type float
+
             new_extracted_face = new_extracted_face.astype(np.float32)
-            #scale
+
             new_extracted_face /= float(new_extracted_face.max())
-            #print(new_extracted_face)
+
 
             new_face.append(new_extracted_face)
 
@@ -132,37 +129,30 @@ def detection():
 
             emotionPrediction(face,model)
 
-            # 3. Eye Detection and Blink Count
             leftEye = shape[lStart:lEnd]
             rightEye = shape[rStart:rEnd]
 
-            # Compute Eye Aspect Ratio
             leftEAR = eye_aspect_ratio(leftEye)
             rightEAR = eye_aspect_ratio(rightEye)
             ear = (leftEAR + rightEAR) / 2.0
 
-            # And plot its contours
             leftEyeHull = cv2.convexHull(leftEye)
             rightEyeHull = cv2.convexHull(rightEye)
             cv2.drawContours(img, [leftEyeHull], -1, (0, 255, 0), 1)
             cv2.drawContours(img, [rightEyeHull], -1, (0, 255, 0), 1)
 
-            # 4. Detect Nose
             nose = shape[nStart:nEnd]
             noseHull = cv2.convexHull(nose)
             cv2.drawContours(img, [noseHull], -1, (0, 255, 0), 1)
 
-            # 5. Detect Mouth
             mouth = shape[mStart:mEnd]
             mouthHull = cv2.convexHull(mouth)
             cv2.drawContours(img, [mouthHull], -1, (0, 255, 0), 1)
 
-            # 6. Detect Jaw
             jaw = shape[jStart:jEnd]
             jawHull = cv2.convexHull(jaw)
             cv2.drawContours(img, [jawHull], -1, (0, 255, 0), 1)
 
-            # 7. Detect Eyebrows
             ebr = shape[ebrStart:ebrEnd]
             ebrHull = cv2.convexHull(ebr)
             cv2.drawContours(img, [ebrHull], -1, (0, 255, 0), 1)
