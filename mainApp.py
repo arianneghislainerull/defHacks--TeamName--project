@@ -9,7 +9,7 @@ class SampleApp(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
 
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
-        self.winfo_toplevel().title("healTherapist")
+        self.winfo_toplevel().title("TherAssist")
         # the container is where we'll stack a bunch of frames on top of each other, then the one we want visible
         # will be raised above the others
         container = tk.Frame(self)
