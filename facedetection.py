@@ -6,7 +6,7 @@ import keras
 from keras.models import load_model
 import cv2
 
-classifier = load_model('./final_xception.h5')
+#classifier = load_model('./final_xception.h5')
 
 cascade_face = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 cascade_eye = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
@@ -31,15 +31,35 @@ def emotionDetection(grayscale,img,model):
     face = cv2.resize(img, (48,48), fx=0.25, fy=0.25)
     face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
     face = np.reshape(face, [1, face.shape[0], face.shape[1], 1])
-    predicted_class = np.argmax(model.predict(face))
 
+    emotion_prediction = model.predict(face)
+    deciphered_emotion = predictionDecipher(emotion_prediction)
+
+    predicted_class = np.argmax(emotion_prediction)
+    #print(emotion_prediction)
     label_map = dict((v,k) for k,v in emotion_dict.items())
     predicted_label = label_map[predicted_class]
 
-    print(predicted_label)
+    print(predicted_class)
+
+def predictionDecipher(model_guess):
+    anger_metric = str(round(model_guess[0][0],3)) #anger
+    disgust_metric = str(round(model_guess[0][1],3)) #anger
+    fear_metric = str(round(model_guess[0][2],3)) #anger
+    happy_metric = str(round(model_guess[0][3],3)) #anger
+    sad_metric = str(round(model_guess[0][4],3)) #anger
+    surprise_metric = str(round(model_guess[0][5],3)) #anger
+    neutral_metric = str(round(model_guess[0][6],3)) #anger
+    print("Anger:"+anger_metric)
+    print("Disgust:"+disgust_metric)
+    print("Fear:"+fear_metric)
+    print("Happy:"+happy_metric)
+    print("Sad:"+sad_metric)
+    print("Surprise:"+surprise_metric)
+    print("Neutral:"+neutral_metric)
 
 vc = cv2.VideoCapture(0)
-model = load_model("./final_xception.h5")
+model = load_model("./video.h5")
 
 #Call function in loop and get it to output guess
 
