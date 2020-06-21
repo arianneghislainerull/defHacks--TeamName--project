@@ -49,12 +49,19 @@ class StartPage(tk.Frame):
 
         def openHw():
             controller.show_frame("PageTwo")
-            os.system('facedetection.py')
+            os.system('emotionSelector.py')
 
         button2 = tk.Button(self, text="Homework",
                             command=lambda: openHw())
+
+        def openEmo():
+            controller.show_frame("PageTwo")
+            os.system('emotionSelecter.py')
+
+        button3 = tk.Button(self, text="Emotion Selector", command=lambda: openEmo())
         button1.pack()
         button2.pack()
+        button3.pack()
 
 
 class PageOne(tk.Frame):
