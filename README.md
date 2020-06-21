@@ -1,4 +1,4 @@
-# defHacks--TeamName--project
+# healTherapist
 
 ## Inspiration
 While we were researching potential hackathon ideas, one of our fellow lovely members stated that people who suffer from Bell’s Palsy may undergo functional electrical stimulation (FES) treatment to enable the patient to feel and move their facial muscles. These people as well are usually given physical therapy exercises to try and move their muscles on their own by physically moving their faces into different emotional states.
