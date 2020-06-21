@@ -12,8 +12,8 @@ from scipy.spatial import distance
 import imutils
 from scipy import ndimage
 import dlib
+from time import process_time
 
-#classifier = load_model('./final_xception.h5')
 
 cascade_face = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 cascade_eye = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
@@ -24,7 +24,7 @@ global shape_y
 global input_shape
 global nClasses
 
-def detection():
+def detection(actual_emotion):
     shape_x = 48
     shape_y = 48
     input_shape = (shape_x, shape_y, 1)
@@ -41,14 +41,14 @@ def detection():
     def detect_face(frame):
 
         #Cascade classifier pre-trained model
-        cascPath = 'face_landmarks.dat'
+        cascPath = 'Model/face_landmarks.dat'
         faceCascade = cv2.CascadeClassifier(cascPath)
 
         #BGR -> Gray conversion
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        grayscale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         #Cascade MultiScale classifier
-        detected_faces = faceCascade.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=6,
+        detected_faces = faceCascade.detectMultiScale(grayscale,scaleFactor=1.1,minNeighbors=6,
                                                       minSize=(shape_x, shape_y),
                                                       flags=cv2.CASCADE_SCALE_IMAGE)
         coord = []
@@ -59,10 +59,10 @@ def detection():
                 cv2.rectangle(frame,(x,y),(x+w,y+h),(0, 255,255),1)
                 coord.append([x,y,w,h])
 
-        return gray, detected_faces, coord
+        return grayscale, detected_faces, coord
 
     def extract_face_features(faces, offset_coefficients=(0.075, 0.05)):
-        gray = faces[0]
+        grayscale = faces[0]
         detected_face = faces[1]
 
         new_face = []
@@ -71,12 +71,10 @@ def detection():
 
             x, y, w, h = det
 
-
-            #Offset coefficient, np.floor takes the lowest integer (delete border of the image)
             horizontal_offset = np.int(np.floor(offset_coefficients[0] * w))
             vertical_offset = np.int(np.floor(offset_coefficients[1] * h))
 
-            extracted_face = gray[y+vertical_offset:y+h, x+horizontal_offset:x-horizontal_offset+w]
+            extracted_face = grayscale[y+vertical_offset:y+h, x+horizontal_offset:x-horizontal_offset+w]
 
             new_extracted_face = zoom(extracted_face, (shape_x / extracted_face.shape[0],shape_y / extracted_face.shape[1]))
 
@@ -100,18 +98,19 @@ def detection():
     (eblStart, eblEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eyebrow"]
     (ebrStart, ebrEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eyebrow"]
 
-    model = load_model('video.h5')
+    model = load_model('Model/video.h5')
     face_detect = dlib.get_frontal_face_detector()
-    predictor_landmarks  = dlib.shape_predictor("face_landmarks.dat")
+    predictor_landmarks  = dlib.shape_predictor("Model/face_landmarks.dat")
 
     vc = cv2.VideoCapture(0)
-
+    start = process_time()
     skip_frame = True
 
     #Call function in loop and get it to output guess
 
     while True:
         _, img = vc.read()
+        unchanged_img = img
         grayscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         rects = face_detect(grayscale,1)
 
@@ -130,38 +129,14 @@ def detection():
                 face /= float(face.max())
                 face = np.reshape(face.flatten(), (1,48,48,1))
 
-                emotionPrediction(face,model)
+                emotion_prediction = emotionPrediction(face,model)
+                if(emotion_prediction == actual_emotion):
+                    end = process_time()
+                    time = end - start
+                    #print(time)
+                    return time, unchanged_img
 
-                leftEye = shape[lStart:lEnd]
-                rightEye = shape[rStart:rEnd]
 
-                leftEAR = eye_aspect_ratio(leftEye)
-                rightEAR = eye_aspect_ratio(rightEye)
-                ear = (leftEAR + rightEAR) / 2.0
-
-                leftEyeHull = cv2.convexHull(leftEye)
-                rightEyeHull = cv2.convexHull(rightEye)
-                cv2.drawContours(img, [leftEyeHull], -1, (0, 255, 0), 1)
-                cv2.drawContours(img, [rightEyeHull], -1, (0, 255, 0), 1)
-
-                nose = shape[nStart:nEnd]
-                noseHull = cv2.convexHull(nose)
-                cv2.drawContours(img, [noseHull], -1, (0, 255, 0), 1)
-
-                mouth = shape[mStart:mEnd]
-                mouthHull = cv2.convexHull(mouth)
-                cv2.drawContours(img, [mouthHull], -1, (0, 255, 0), 1)
-
-                jaw = shape[jStart:jEnd]
-                jawHull = cv2.convexHull(jaw)
-                cv2.drawContours(img, [jawHull], -1, (0, 255, 0), 1)
-
-                ebr = shape[ebrStart:ebrEnd]
-                ebrHull = cv2.convexHull(ebr)
-                cv2.drawContours(img, [ebrHull], -1, (0, 255, 0), 1)
-                ebl = shape[eblStart:eblEnd]
-                eblHull = cv2.convexHull(ebl)
-                cv2.drawContours(img, [eblHull], -1, (0, 255, 0), 1)
 
         skip_frame = not skip_frame
 
@@ -175,7 +150,7 @@ def detection():
 
 def emotionPrediction(face,model):
 
-    emotion_dict= {'Angry': 0, 'Sad': 5, 'Neutral': 4, 'Disgust': 1, 'Surprise': 6, 'Fear': 2, 'Happy': 3}
+    emotion_dict= {'Angry': 0, 'Sad': 4, 'Neutral': 6, 'Disgust': 1, 'Surprise': 5, 'Fear': 2, 'Happy': 3}
 
     emotion_prediction = model.predict(face)
     deciphered_emotion = predictionDecipher(emotion_prediction)
@@ -183,24 +158,42 @@ def emotionPrediction(face,model):
     integer_prediction = np.argmax(emotion_prediction)
 
     label_map = dict((v,k) for k,v in emotion_dict.items())
-    predicted_label = label_map[integer_prediction]
+    label = label_map[integer_prediction]
 
-    print(predicted_label)
+    #print(label)
+    #print()
+
+    return label
 
 def predictionDecipher(model_guess):
     anger_metric = str(round(model_guess[0][0],3)) #anger
-    disgust_metric = str(round(model_guess[0][1],3)) #anger
-    fear_metric = str(round(model_guess[0][2],3)) #anger
-    happy_metric = str(round(model_guess[0][3],3)) #anger
-    sad_metric = str(round(model_guess[0][4],3)) #anger
-    surprise_metric = str(round(model_guess[0][5],3)) #anger
-    neutral_metric = str(round(model_guess[0][6],3)) #anger
-    print("Anger:"+anger_metric)
-    print("Disgust:"+disgust_metric)
-    print("Fear:"+fear_metric)
-    print("Happy:"+happy_metric)
-    print("Sad:"+sad_metric)
-    print("Surprise:"+surprise_metric)
-    print("Neutral:"+neutral_metric)
+    disgust_metric = str(round(model_guess[0][1],3)) #disgust
+    fear_metric = str(round(model_guess[0][2],3)) #fear
+    happy_metric = str(round(model_guess[0][3],3)) #happy
+    sad_metric = str(round(model_guess[0][4],3)) #sad
+    surprise_metric = str(round(model_guess[0][5],3)) #surprise
+    neutral_metric = str(round(model_guess[0][6],3)) #neutral
+    #print("Anger:"+anger_metric)
+    #print("Disgust:"+disgust_metric)
+    #print("Fear:"+fear_metric)
+    #print("Happy:"+happy_metric)
+    #print("Sad:"+sad_metric)
+    #print("Surprise:"+surprise_metric)
+    #print("Neutral:"+neutral_metric)
 
-detection()
+def main(actual_emotion):
+    results = detection(actual_emotion) # returns true when user's emotion matches actual_emotion
+
+    time = results[0]
+
+    image = Image.fromarray(results[1], 'RGB')
+    image.save("./Users_pictures/users-"+actual_emotion+"-photo.jpg","JPEG")
+    image.show()
+
+#main("Happy") # Runs whole script
+#Send a string with one of the emotions - to not have one emotion be tested
+#Don't send it as an option.
+
+# Things to improve
+ # 1) Picture comes out blueish for some reason
+ # 2) Make the same emotion have to be detected a 2 or 3 times in a row to return
