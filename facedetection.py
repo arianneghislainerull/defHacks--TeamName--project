@@ -5,6 +5,13 @@ import face_recognition
 import keras
 from keras.models import load_model
 import cv2
+import pandas as pd
+from imutils import face_utils
+from scipy.ndimage import zoom
+from scipy.spatial import distance
+import imutils
+from scipy import ndimage
+import dlib
 
 #classifier = load_model('./final_xception.h5')
 
@@ -12,33 +19,172 @@ cascade_face = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fronta
 cascade_eye = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 cascade_smile = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_smile.xml')
 
-def detection(grayscale, img):
-    face = cascade_face.detectMultiScale(grayscale, 1.3, 5)
-    for (x_face, y_face, w_face, h_face) in face:
-        cv2.rectangle(img, (x_face, y_face), (x_face+w_face, y_face+h_face), (255, 130, 0), 2)
-        ri_grayscale = grayscale[y_face:y_face+h_face, x_face:x_face+w_face]
-        ri_color = img[y_face:y_face+h_face, x_face:x_face+w_face]
-        eye = cascade_eye.detectMultiScale(ri_grayscale, 1.2, 18)
-        for (x_eye, y_eye, w_eye, h_eye) in eye:
-            cv2.rectangle(ri_color,(x_eye, y_eye),(x_eye+w_eye, y_eye+h_eye), (0, 180, 60), 2)
-        smile = cascade_smile.detectMultiScale(ri_grayscale, 1.7, 20)
-        for (x_smile, y_smile, w_smile, h_smile) in smile:
-            cv2.rectangle(ri_color,(x_smile, y_smile),(x_smile+w_smile, y_smile+h_smile), (255, 0, 130), 2)
-    return img
+global shape_x
+global shape_y
+global input_shape
+global nClasses
 
-def emotionDetection(grayscale,img,model):
-    emotion_dict= {'Angry': 0, 'Sad': 5, 'Neutral': 4, 'Disgust': 1, 'Surprise': 6, 'Fear': 2, 'Happy': 3}
-    face = cv2.resize(img, (48,48), fx=0.25, fy=0.25)
-    face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
-    face = np.reshape(face, [1, face.shape[0], face.shape[1], 1])
+def detection():
+    shape_x = 48
+    shape_y = 48
+    input_shape = (shape_x, shape_y, 1)
+    nClasses = 7
+
+    thresh = 0.25
+    frame_check = 20
+    def eye_aspect_ratio(eye):
+        A = distance.euclidean(eye[1], eye[5])
+        B = distance.euclidean(eye[2], eye[4])
+        C = distance.euclidean(eye[0], eye[3])
+        ear = (A + B) / (2.0 * C)
+        return ear
+    def detect_face(frame):
+
+        #Cascade classifier pre-trained model
+        cascPath = 'face_landmarks.dat'
+        faceCascade = cv2.CascadeClassifier(cascPath)
+
+        #BGR -> Gray conversion
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        #Cascade MultiScale classifier
+        detected_faces = faceCascade.detectMultiScale(gray,scaleFactor=1.1,minNeighbors=6,
+                                                      minSize=(shape_x, shape_y),
+                                                      flags=cv2.CASCADE_SCALE_IMAGE)
+        coord = []
+
+        for x, y, w, h in detected_faces :
+            if w > 100 :
+                sub_img=frame[y:y+h,x:x+w]
+                cv2.rectangle(frame,(x,y),(x+w,y+h),(0, 255,255),1)
+                coord.append([x,y,w,h])
+
+        return gray, detected_faces, coord
+
+    def extract_face_features(faces, offset_coefficients=(0.075, 0.05)):
+        gray = faces[0]
+        detected_face = faces[1]
+
+        new_face = []
+
+        for det in detected_face :
+            #Region dans laquelle la face est détectée
+            x, y, w, h = det
+            #X et y correspondent à la conversion en gris par gray, et w, h correspondent à la hauteur/largeur
+
+            #Offset coefficient, np.floor takes the lowest integer (delete border of the image)
+            horizontal_offset = np.int(np.floor(offset_coefficients[0] * w))
+            vertical_offset = np.int(np.floor(offset_coefficients[1] * h))
+
+            #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            #gray transforme l'image
+            extracted_face = gray[y+vertical_offset:y+h, x+horizontal_offset:x-horizontal_offset+w]
+
+            #Zoom sur la face extraite
+            new_extracted_face = zoom(extracted_face, (shape_x / extracted_face.shape[0],shape_y / extracted_face.shape[1]))
+            #cast type float
+            new_extracted_face = new_extracted_face.astype(np.float32)
+            #scale
+            new_extracted_face /= float(new_extracted_face.max())
+            #print(new_extracted_face)
+
+            new_face.append(new_extracted_face)
+
+        return new_face
+
+
+    (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
+    (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
+
+    (nStart, nEnd) = face_utils.FACIAL_LANDMARKS_IDXS["nose"]
+    (mStart, mEnd) = face_utils.FACIAL_LANDMARKS_IDXS["mouth"]
+    (jStart, jEnd) = face_utils.FACIAL_LANDMARKS_IDXS["jaw"]
+
+    (eblStart, eblEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eyebrow"]
+    (ebrStart, ebrEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eyebrow"]
+
+    model = load_model('video.h5')
+    face_detect = dlib.get_frontal_face_detector()
+    predictor_landmarks  = dlib.shape_predictor("face_landmarks.dat")
+
+    vc = cv2.VideoCapture(0)
+
+    #Call function in loop and get it to output guess
+
+    while True:
+        _, img = vc.read()
+        grayscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        rects = face_detect(grayscale,1)
+
+        for (i, rect) in enumerate(rects):
+            shape = predictor_landmarks(grayscale,rect)
+            shape = face_utils.shape_to_np(shape)
+
+            (x,y,w,h)= face_utils.rect_to_bb(rect) #Face coordinates
+            face = grayscale[y:y+h,x:x+w]
+
+            face = zoom(face, (shape_x / face.shape[0],shape_y / face.shape[1]))
+
+            face = face.astype(np.float32)
+
+            face /= float(face.max())
+            face = np.reshape(face.flatten(), (1,48,48,1))
+
+            emotionPrediction(face,model)
+
+            # 3. Eye Detection and Blink Count
+            leftEye = shape[lStart:lEnd]
+            rightEye = shape[rStart:rEnd]
+
+            # Compute Eye Aspect Ratio
+            leftEAR = eye_aspect_ratio(leftEye)
+            rightEAR = eye_aspect_ratio(rightEye)
+            ear = (leftEAR + rightEAR) / 2.0
+
+            # And plot its contours
+            leftEyeHull = cv2.convexHull(leftEye)
+            rightEyeHull = cv2.convexHull(rightEye)
+            cv2.drawContours(img, [leftEyeHull], -1, (0, 255, 0), 1)
+            cv2.drawContours(img, [rightEyeHull], -1, (0, 255, 0), 1)
+
+            # 4. Detect Nose
+            nose = shape[nStart:nEnd]
+            noseHull = cv2.convexHull(nose)
+            cv2.drawContours(img, [noseHull], -1, (0, 255, 0), 1)
+
+            # 5. Detect Mouth
+            mouth = shape[mStart:mEnd]
+            mouthHull = cv2.convexHull(mouth)
+            cv2.drawContours(img, [mouthHull], -1, (0, 255, 0), 1)
+
+            # 6. Detect Jaw
+            jaw = shape[jStart:jEnd]
+            jawHull = cv2.convexHull(jaw)
+            cv2.drawContours(img, [jawHull], -1, (0, 255, 0), 1)
+
+            # 7. Detect Eyebrows
+            ebr = shape[ebrStart:ebrEnd]
+            ebrHull = cv2.convexHull(ebr)
+            cv2.drawContours(img, [ebrHull], -1, (0, 255, 0), 1)
+            ebl = shape[eblStart:eblEnd]
+            eblHull = cv2.convexHull(ebl)
+            cv2.drawContours(img, [eblHull], -1, (0, 255, 0), 1)
+
+        cv2.imshow('Video', img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    vc.release()
+    cv2.destroyAllWindows()
+
+
+def emotionPrediction(face,model):
 
     emotion_prediction = model.predict(face)
     deciphered_emotion = predictionDecipher(emotion_prediction)
 
     predicted_class = np.argmax(emotion_prediction)
     #print(emotion_prediction)
-    label_map = dict((v,k) for k,v in emotion_dict.items())
-    predicted_label = label_map[predicted_class]
 
     print(predicted_class)
 
@@ -58,19 +204,4 @@ def predictionDecipher(model_guess):
     print("Surprise:"+surprise_metric)
     print("Neutral:"+neutral_metric)
 
-vc = cv2.VideoCapture(0)
-model = load_model("./video.h5")
-
-#Call function in loop and get it to output guess
-
-while True:
-    _, img = vc.read()
-    grayscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    final = detection(grayscale, img)
-    emotionDetection(grayscale,img,model)
-    cv2.imshow('Video', final)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-vc.release()
-cv2.destroyAllWindows()
+detection()
