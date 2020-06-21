@@ -2,6 +2,13 @@ import random
 from PIL import Image
 from pathlib import Path
 
+# I just found one picture for each of the emotions that is used in a emotion
+# recognition bot I found. Finding more will probably be needed
+
+# this script return an image for an emotion or can randomly select an emotion
+
+
+# Image paths
 happyPath = Path("./Faces/happy.jpg")
 sadPath = Path("./Faces/sad.jpg")
 angryPath = Path("./Faces/angry.jpg")
@@ -10,6 +17,7 @@ disgustPath = Path("./Faces/disgust.jpg")
 surprisePath = Path("./Faces/surprise.jpg")
 fearPath = Path("./Faces/fear.jpg")
 
+#Creating and resizing the images
 happyImage = Image.open(happyPath)
 happyImage = happyImage.resize((512,512))
 
@@ -31,6 +39,7 @@ surpriseImage = surpriseImage.resize((512,512))
 fearImage = Image.open(fearPath)
 fearImage = fearImage.resize((512,512))
 
+
 def randomEmotion():
     emotionNumber = random.randint(1,7)
     switcher = {
@@ -43,6 +52,10 @@ def randomEmotion():
         7: surprise()
     }
     return switcher.get(emotionNumber,"Error")
+
+#Each function returns a photo based on the emotion selected
+
+# Could also verbally say the word
 
 def happy():
     #happyImage.show()
