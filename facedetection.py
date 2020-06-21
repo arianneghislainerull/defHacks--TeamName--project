@@ -106,6 +106,8 @@ def detection():
 
     vc = cv2.VideoCapture(0)
 
+    skip_frame = True
+
     #Call function in loop and get it to output guess
 
     while True:
@@ -113,52 +115,55 @@ def detection():
         grayscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         rects = face_detect(grayscale,1)
 
-        for (i, rect) in enumerate(rects):
-            shape = predictor_landmarks(grayscale,rect)
-            shape = face_utils.shape_to_np(shape)
+        if skip_frame:
+            for (i, rect) in enumerate(rects):
+                shape = predictor_landmarks(grayscale,rect)
+                shape = face_utils.shape_to_np(shape)
 
-            (x,y,w,h)= face_utils.rect_to_bb(rect) #Face coordinates
-            face = grayscale[y:y+h,x:x+w]
+                (x,y,w,h)= face_utils.rect_to_bb(rect) #Face coordinates
+                face = grayscale[y:y+h,x:x+w]
 
-            face = zoom(face, (shape_x / face.shape[0],shape_y / face.shape[1]))
+                face = zoom(face, (shape_x / face.shape[0],shape_y / face.shape[1]))
 
-            face = face.astype(np.float32)
+                face = face.astype(np.float32)
 
-            face /= float(face.max())
-            face = np.reshape(face.flatten(), (1,48,48,1))
+                face /= float(face.max())
+                face = np.reshape(face.flatten(), (1,48,48,1))
 
-            emotionPrediction(face,model)
+                emotionPrediction(face,model)
 
-            leftEye = shape[lStart:lEnd]
-            rightEye = shape[rStart:rEnd]
+                leftEye = shape[lStart:lEnd]
+                rightEye = shape[rStart:rEnd]
 
-            leftEAR = eye_aspect_ratio(leftEye)
-            rightEAR = eye_aspect_ratio(rightEye)
-            ear = (leftEAR + rightEAR) / 2.0
+                leftEAR = eye_aspect_ratio(leftEye)
+                rightEAR = eye_aspect_ratio(rightEye)
+                ear = (leftEAR + rightEAR) / 2.0
 
-            leftEyeHull = cv2.convexHull(leftEye)
-            rightEyeHull = cv2.convexHull(rightEye)
-            cv2.drawContours(img, [leftEyeHull], -1, (0, 255, 0), 1)
-            cv2.drawContours(img, [rightEyeHull], -1, (0, 255, 0), 1)
+                leftEyeHull = cv2.convexHull(leftEye)
+                rightEyeHull = cv2.convexHull(rightEye)
+                cv2.drawContours(img, [leftEyeHull], -1, (0, 255, 0), 1)
+                cv2.drawContours(img, [rightEyeHull], -1, (0, 255, 0), 1)
 
-            nose = shape[nStart:nEnd]
-            noseHull = cv2.convexHull(nose)
-            cv2.drawContours(img, [noseHull], -1, (0, 255, 0), 1)
+                nose = shape[nStart:nEnd]
+                noseHull = cv2.convexHull(nose)
+                cv2.drawContours(img, [noseHull], -1, (0, 255, 0), 1)
 
-            mouth = shape[mStart:mEnd]
-            mouthHull = cv2.convexHull(mouth)
-            cv2.drawContours(img, [mouthHull], -1, (0, 255, 0), 1)
+                mouth = shape[mStart:mEnd]
+                mouthHull = cv2.convexHull(mouth)
+                cv2.drawContours(img, [mouthHull], -1, (0, 255, 0), 1)
 
-            jaw = shape[jStart:jEnd]
-            jawHull = cv2.convexHull(jaw)
-            cv2.drawContours(img, [jawHull], -1, (0, 255, 0), 1)
+                jaw = shape[jStart:jEnd]
+                jawHull = cv2.convexHull(jaw)
+                cv2.drawContours(img, [jawHull], -1, (0, 255, 0), 1)
 
-            ebr = shape[ebrStart:ebrEnd]
-            ebrHull = cv2.convexHull(ebr)
-            cv2.drawContours(img, [ebrHull], -1, (0, 255, 0), 1)
-            ebl = shape[eblStart:eblEnd]
-            eblHull = cv2.convexHull(ebl)
-            cv2.drawContours(img, [eblHull], -1, (0, 255, 0), 1)
+                ebr = shape[ebrStart:ebrEnd]
+                ebrHull = cv2.convexHull(ebr)
+                cv2.drawContours(img, [ebrHull], -1, (0, 255, 0), 1)
+                ebl = shape[eblStart:eblEnd]
+                eblHull = cv2.convexHull(ebl)
+                cv2.drawContours(img, [eblHull], -1, (0, 255, 0), 1)
+
+        skip_frame = not skip_frame
 
         cv2.imshow('Video', img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -170,13 +175,17 @@ def detection():
 
 def emotionPrediction(face,model):
 
+    emotion_dict= {'Angry': 0, 'Sad': 5, 'Neutral': 4, 'Disgust': 1, 'Surprise': 6, 'Fear': 2, 'Happy': 3}
+
     emotion_prediction = model.predict(face)
     deciphered_emotion = predictionDecipher(emotion_prediction)
 
-    predicted_class = np.argmax(emotion_prediction)
-    #print(emotion_prediction)
+    integer_prediction = np.argmax(emotion_prediction)
 
-    print(predicted_class)
+    label_map = dict((v,k) for k,v in emotion_dict.items())
+    predicted_label = label_map[integer_prediction]
+
+    print(predicted_label)
 
 def predictionDecipher(model_guess):
     anger_metric = str(round(model_guess[0][0],3)) #anger
