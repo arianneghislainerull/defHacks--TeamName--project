@@ -1,7 +1,15 @@
+from PIL import Image
+from matplotlib import pyplot as plt
+import numpy as np
+import face_recognition
+import keras
+from keras.models import load_model
 import cv2
 
+classifier = load_model('./final_xception.h5')
+
 cascade_face = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-cascade_eye = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml') 
+cascade_eye = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 cascade_smile = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_smile.xml')
 
 def detection(grayscale, img):
@@ -9,24 +17,40 @@ def detection(grayscale, img):
     for (x_face, y_face, w_face, h_face) in face:
         cv2.rectangle(img, (x_face, y_face), (x_face+w_face, y_face+h_face), (255, 130, 0), 2)
         ri_grayscale = grayscale[y_face:y_face+h_face, x_face:x_face+w_face]
-        ri_color = img[y_face:y_face+h_face, x_face:x_face+w_face] 
-        eye = cascade_eye.detectMultiScale(ri_grayscale, 1.2, 18) 
+        ri_color = img[y_face:y_face+h_face, x_face:x_face+w_face]
+        eye = cascade_eye.detectMultiScale(ri_grayscale, 1.2, 18)
         for (x_eye, y_eye, w_eye, h_eye) in eye:
-            cv2.rectangle(ri_color,(x_eye, y_eye),(x_eye+w_eye, y_eye+h_eye), (0, 180, 60), 2) 
+            cv2.rectangle(ri_color,(x_eye, y_eye),(x_eye+w_eye, y_eye+h_eye), (0, 180, 60), 2)
         smile = cascade_smile.detectMultiScale(ri_grayscale, 1.7, 20)
-        for (x_smile, y_smile, w_smile, h_smile) in smile: 
+        for (x_smile, y_smile, w_smile, h_smile) in smile:
             cv2.rectangle(ri_color,(x_smile, y_smile),(x_smile+w_smile, y_smile+h_smile), (255, 0, 130), 2)
-    return img 
+    return img
 
-vc = cv2.VideoCapture(0) 
+def emotionDetection(grayscale,img,model):
+    emotion_dict= {'Angry': 0, 'Sad': 5, 'Neutral': 4, 'Disgust': 1, 'Surprise': 6, 'Fear': 2, 'Happy': 3}
+    face = cv2.resize(img, (48,48), fx=0.25, fy=0.25)
+    face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
+    face = np.reshape(face, [1, face.shape[0], face.shape[1], 1])
+    predicted_class = np.argmax(model.predict(face))
+
+    label_map = dict((v,k) for k,v in emotion_dict.items())
+    predicted_label = label_map[predicted_class]
+
+    print(predicted_label)
+
+vc = cv2.VideoCapture(0)
+model = load_model("./final_xception.h5")
+
+#Call function in loop and get it to output guess
 
 while True:
-    _, img = vc.read() 
-    grayscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) 
-    final = detection(grayscale, img) 
-    cv2.imshow('Video', final) 
+    _, img = vc.read()
+    grayscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    final = detection(grayscale, img)
+    emotionDetection(grayscale,img,model)
+    cv2.imshow('Video', final)
     if cv2.waitKey(1) & 0xFF == ord('q'):
-        break 
+        break
 
-vc.release() 
-cv2.destroyAllWindows() 
+vc.release()
+cv2.destroyAllWindows()

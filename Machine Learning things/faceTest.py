@@ -10,33 +10,6 @@ import cv2
 
 classifier = load_model('./model_v6_23.hdf5')
 
-#Face Recognition
-
-print("Face Recognition")
-
-image1 = Image.open("./test_images/index2.jpeg")
-image_array1 = np.array(image1)
-plt.imshow(image_array1)
-
-image2 = Image.open("./test_images/index1.jpg")
-image_array2 = np.array(image2)
-plt.imshow(image_array2)
-
-image3 = Image.open("./test_images/rajeev.jpg")
-image_array3 = np.array(image3)
-plt.imshow(image_array3)
-
-image1 = face_recognition.load_image_file("./test_images/index1.jpg")
-image2 = face_recognition.load_image_file("./test_images/rajeev.jpg")
-
-encoding_1 = face_recognition.face_encodings(image1)[0]
-
-encoding_2 = face_recognition.face_encodings(image1)[0]
-
-results = face_recognition.compare_faces([encoding_1], encoding_2,tolerance=0.50)
-
-print (results)
-
 #Emotion Detection
 
 print("Emotion Detection")
@@ -47,6 +20,9 @@ face_locations = []
 face_encodings = []
 face_names = []
 process_this_frame = True
+# model_v6_23.hdf5 ## No Lag but Not Accurate
+# final_xception.h5 ## So much lag but Accurate (not currently printing out the right results tho)
+model = load_model("./final_xception.h5")
 
 while True:
     # Grab a single frame of video
@@ -72,7 +48,7 @@ while True:
 
 
 
-        model = load_model("./model_v6_23.hdf5")
+
         print("Trained:")
         print (face_image.shape) #Trained prediction
 
@@ -84,30 +60,8 @@ while True:
         print(predicted_label)
         emotion = predicted_label
 
-        #for face_encoding in face_encodings:
-            # See if the face is a match for the known face(s)
-            #matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-            #emotion = predicted_label
-
-            # # If a match was found in known_face_encodings, just use the first one.
-            # if True in matches:
-            #     first_match_index = matches.index(True)
-            #     name = known_face_names[first_match_index]
-
-            # Or instead, use the known face with the smallest distance to the new face
-            #face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
-            #best_match_index = np.argmin(face_distances)
-            #if matches[best_match_index]:
-            #    name = known_face_names[best_match_index]
-
-            #face_names.append(name)
 
     process_this_frame = not process_this_frame
-
-    #model = load_model("./emotion_detector_models/model.hdf5")
-    #predicted_class = np.argmax(model.predict(frame))
-    #print(pred)
-
 
     # Display the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
@@ -145,4 +99,4 @@ print (face_image.shape) #Untrained prediction
 
 
 
-plt.show()
+#plt.show()
