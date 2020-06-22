@@ -136,14 +136,13 @@ def detection(actual_emotion):
 
                 emotion_prediction = emotionPrediction(face,model)
                 if emotion_prediction in predictDic:
-
-	                predictDic[emotion_prediction] += 1
-                    	if emotion_prediction == actual_emotion and predictDic[emotion_prediction] >= 2:
-                    		end = process_time()
-                        	time = end - start
-                        	#print(time)
-                        	frame = cv2.cvtColor(grayscale,cv2.COLOR_GRAY2RGB)
-                        	return time, image
+	            predictDic[emotion_prediction] += 1
+                    if emotion_prediction == actual_emotion and predictDic[emotion_prediction] >= 2:
+                        end = process_time()
+                        time = end - start
+                        #print(time)
+                        frame = cv2.cvtColor(grayscale,cv2.COLOR_GRAY2RGB)
+                        return time, image
                 else:
                     predictDic = {emotion_prediction: 1}
 
