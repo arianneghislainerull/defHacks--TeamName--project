@@ -137,7 +137,7 @@ def detection(actual_emotion):
                 emotion_prediction = emotionPrediction(face,model)
                 if emotion_prediction in predictDic:
 	            predictDic[emotion_prediction] += 1
-                    if emotion_prediction == actual_emotion and predictDic[emotion_prediction] >= 2:
+                    if emotion_prediction is actual_emotion and predictDic[emotion_prediction] >= 2:
                         end = process_time()
                         time = end - start
                         #print(time)
