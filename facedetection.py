@@ -107,7 +107,7 @@ def detection(actual_emotion):
     skip_frame = True
 
     #Call function in loop and get it to output guess
-    
+
     predicDic = {"Emotion": 1}
     while True:
         _, img = vc.read()
@@ -136,8 +136,11 @@ def detection(actual_emotion):
 
                 emotion_prediction = emotionPrediction(face,model)
                 if emotion_prediction in predictDic:
+
 	                predictDic[emotion_prediction] += 1
+
                     if emotion_prediction == actual_emotion and predictDic[emotion_prediction] >= 2:
+
                         end = process_time()
                         time = end - start
                         #print(time)
@@ -145,13 +148,7 @@ def detection(actual_emotion):
                         return time, image
                 else:
                     predictDic = {emotion_prediction: 1}
-	   
-                #if(emotion_prediction == actual_emotion):
-                    #end = process_time()
-                  # time = end - start
-                    #print(time)
-                    #frame = cv2.cvtColor(grayscale,cv2.COLOR_GRAY2RGB)
-                    #return time, image
+
 
 
 
@@ -211,7 +208,3 @@ def main(actual_emotion):
 main("Happy") # Runs whole script
 #Send a string with one of the emotions - to not have one emotion be tested
 #Don't send it as an option.
-
-# Things to improve
- # 1) Picture comes out blueish for some reason
- # 2) Make the same emotion have to be detected a 2 or 3 times in a row to return
