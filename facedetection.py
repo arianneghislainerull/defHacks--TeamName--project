@@ -110,7 +110,10 @@ def detection(actual_emotion):
 
     while True:
         _, img = vc.read()
-        unchanged_img = img
+        image = img[:]
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = Image.fromarray(image, 'RGB')
+        #image.show()
         grayscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         rects = face_detect(grayscale,1)
 
@@ -134,7 +137,8 @@ def detection(actual_emotion):
                     end = process_time()
                     time = end - start
                     #print(time)
-                    return time, unchanged_img
+                    frame = cv2.cvtColor(grayscale,cv2.COLOR_GRAY2RGB)
+                    return time, image
 
 
 
@@ -186,11 +190,12 @@ def main(actual_emotion):
 
     time = results[0]
 
-    image = Image.fromarray(results[1], 'RGB')
+    #image = Image.fromarray(results[1], 'RGB')
+    image = results[1]
     image.save("./Users_pictures/users-"+actual_emotion+"-photo.jpg","JPEG")
     image.show()
 
-#main("Happy") # Runs whole script
+main("Happy") # Runs whole script
 #Send a string with one of the emotions - to not have one emotion be tested
 #Don't send it as an option.
 
