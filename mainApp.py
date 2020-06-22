@@ -76,7 +76,7 @@ class StartPage(tk.Frame):
 
         def openEmo():
             controller.show_frame("PageTwo")
-            os.system('emotionSelecter.py')
+            os.system('emotionSelector2.py')
 
         button3 = tk.Button(self, text="Emotion Selector", command=lambda: openEmo(),image = img3)
         button3.image = img3
