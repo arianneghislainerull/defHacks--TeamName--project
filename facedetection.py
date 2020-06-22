@@ -111,6 +111,7 @@ def detection(actual_emotion):
     while True:
         _, img = vc.read()
         image = img[:]
+
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image = Image.fromarray(image, 'RGB')
         #image.show()
