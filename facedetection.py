@@ -108,7 +108,6 @@ def detection(actual_emotion):
 
     #Call function in loop and get it to output guess
 
-    predicDic = {"Emotion": 1}
     while True:
         _, img = vc.read()
         image = img[:]
@@ -135,17 +134,12 @@ def detection(actual_emotion):
                 face = np.reshape(face.flatten(), (1,48,48,1))
 
                 emotion_prediction = emotionPrediction(face,model)
-                if emotion_prediction in predictDic:
-	            predictDic[emotion_prediction] += 1
-                    if emotion_prediction == actual_emotion and predictDic[emotion_prediction] >= 2:
-                        end = process_time()
-                        time = end - start
-                        #print(time)
-                        frame = cv2.cvtColor(grayscale,cv2.COLOR_GRAY2RGB)
-                        return time, image
-                else:
-                    predictDic = {emotion_prediction: 1}
-
+                if(emotion_prediction == actual_emotion):
+                    end = process_time()
+                    time = end - start
+                    #print(time)
+                    frame = cv2.cvtColor(grayscale,cv2.COLOR_GRAY2RGB)
+                    return time, image
 
 
 
