@@ -137,7 +137,7 @@ def detection(actual_emotion):
                 if(emotion_prediction == actual_emotion):
                     end = process_time()
                     time = end - start
-                    #print(time)
+                    print(time)
                     frame = cv2.cvtColor(grayscale,cv2.COLOR_GRAY2RGB)
                     return time, image
 
@@ -165,7 +165,7 @@ def emotionPrediction(face,model):
     label_map = dict((v,k) for k,v in emotion_dict.items())
     label = label_map[integer_prediction]
 
-    #print(label)
+    print(label)
     #print()
 
     return label
