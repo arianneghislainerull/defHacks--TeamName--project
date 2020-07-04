@@ -72,6 +72,7 @@ class StartPage(tk.Frame):
             controller.show_frame("PageTwo")
             os.system('emotionSelector2.py')
 
+
         button2 = tk.Button(self, text="Homework",
                             command=lambda: openHw(), image = img2)
         button2.image = img2
@@ -79,6 +80,26 @@ class StartPage(tk.Frame):
         def openEmo():
             controller.show_frame("PageTwo")
             os.system('emotionSelector2.py')
+
+            # Start the backend
+            count = 0
+            while count < 1:
+                emotionStarter = randomEmotion()
+                # Randomly selects an emotion and returns a sound and image representing that emotion
+                image = emotionStarter[0]
+                emotion = emotionStarter[1]
+                #print(emotion)
+                results = main(emotion) # Starts the face/emotion detection
+                time = results[0]
+                resultImage = results[1]
+
+                #TODO LIST:
+                    #Display Image on the App
+                    #Display a list of times after
+                    #Close camera after loop
+                    #Fix logo display
+
+                count = count + 1
 
         button3 = tk.Button(self, text="Emotion Selector", command=lambda: openEmo(),image = img3)
         button3.image = img3

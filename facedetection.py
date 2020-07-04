@@ -137,7 +137,7 @@ def detection(actual_emotion):
                 if(emotion_prediction == actual_emotion):
                     end = process_time()
                     time = end - start
-                    print(time)
+                    #print(time)
                     frame = cv2.cvtColor(grayscale,cv2.COLOR_GRAY2RGB)
                     return time, image
 
@@ -194,7 +194,8 @@ def main(actual_emotion):
     #image = Image.fromarray(results[1], 'RGB')
     image = results[1]
     image.save("./Users_pictures/users-"+actual_emotion+"-photo.jpg","JPEG")
-    image.show()
+    #image.show()
+    return time , image
 
 #main("Happy") # Runs whole script
 #Send a string with one of the emotions - to not have one emotion be tested
