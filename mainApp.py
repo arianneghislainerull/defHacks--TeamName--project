@@ -49,7 +49,7 @@ class StartPage(tk.Frame):
 
         # Creates a Tkinter-compatible photo image, which can be used everywhere Tkinter expects an image object.
         global tImg
-        tImg = ImageTk.PhotoImage(Image.open('logo3.png'))
+        tImg = ImageTk.PhotoImage(Image.open('buttons/logo3.png'))
 
         # The Label widget is a standard Tkinter widget used to display a text or image on the screen.
         panel = tk.Label(self, image=tImg)
@@ -60,9 +60,9 @@ class StartPage(tk.Frame):
 
 
         global img,img2,img3
-        img = ImageTk.PhotoImage(Image.open("buttonManual.png"))  # make sure to add "/" not "\"
-        img2 = ImageTk.PhotoImage(Image.open("btnHW.png"))  # make sure to add "/" not "\"
-        img3 = ImageTk.PhotoImage(Image.open("btnEmo.png"))  # make sure to add "/" not "\"
+        img = ImageTk.PhotoImage(Image.open("buttons/buttonManual.png"))  # make sure to add "/" not "\"
+        img2 = ImageTk.PhotoImage(Image.open("buttons/btnHW.png"))  # make sure to add "/" not "\"
+        img3 = ImageTk.PhotoImage(Image.open("buttons/btnEmo.png"))  # make sure to add "/" not "\"
         button1 = tk.Button(self, text="Manual",
                             command=lambda: controller.show_frame("PageOne"), image = img)
         button1.image = img
@@ -114,10 +114,10 @@ class PageOne(tk.Frame):
             return
 
         global imgS, imgN, imgF, imgH
-        imgS = ImageTk.PhotoImage(Image.open("button_satisfactory.png"))
-        imgN = ImageTk.PhotoImage(Image.open("button_needs-improvement.png"))
-        imgF = ImageTk.PhotoImage(Image.open("button_finish-session.png"))
-        imgH = ImageTk.PhotoImage(Image.open("button_home.png"))
+        imgS = ImageTk.PhotoImage(Image.open("buttons/button_satisfactory.png"))
+        imgN = ImageTk.PhotoImage(Image.open("buttons/button_needs-improvement.png"))
+        imgF = ImageTk.PhotoImage(Image.open("buttons/button_finish-session.png"))
+        imgH = ImageTk.PhotoImage(Image.open("buttons/button_home.png"))
         good = tk.Button(self, text = "Satisfactory", command = lambda: changeInput(True),image = imgS)
         improve = tk.Button(self, text = "Needs Improvement", command = lambda: changeInput(False), image = imgN)
         finish = tk.Button(self, text = "Finish Session", command = lambda: generateReport(), image = imgF)
