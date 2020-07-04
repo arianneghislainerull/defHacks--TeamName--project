@@ -59,16 +59,16 @@ class StartPage(tk.Frame):
 
 
         global img,img2,img3
-        img = tk.PhotoImage(file="buttonManual.png")  # make sure to add "/" not "\"
-        img2 = tk.PhotoImage(file="btnHW.png")  # make sure to add "/" not "\"
-        img3 = tk.PhotoImage(file="btnEmo.png")  # make sure to add "/" not "\"
+        img = ImageTk.PhotoImage(Image.open("buttonManual.png"))  # make sure to add "/" not "\"
+        img2 = ImageTk.PhotoImage(Image.open("btnHW.png"))  # make sure to add "/" not "\"
+        img3 = ImageTk.PhotoImage(Image.open("btnEmo.png"))  # make sure to add "/" not "\"
         button1 = tk.Button(self, text="Manual",
                             command=lambda: controller.show_frame("PageOne"), image = img)
         button1.image = img
 
         def openHw():
             controller.show_frame("PageTwo")
-            os.system('emotionSelector.py')
+            os.system('emotionSelector2.py')
 
         button2 = tk.Button(self, text="Homework",
                             command=lambda: openHw(), image = img2)
@@ -113,10 +113,10 @@ class PageOne(tk.Frame):
             return
 
         global imgS, imgN, imgF, imgH
-        imgS = tk.PhotoImage(file="button_satisfactory.png")
-        imgN = tk.PhotoImage(file="button_needs-improvement.png")
-        imgF = tk.PhotoImage(file="button_finish-session.png")
-        imgH = tk.PhotoImage(file="button_home.png")
+        imgS = ImageTk.PhotoImage(Image.open("button_satisfactory.png"))
+        imgN = ImageTk.PhotoImage(Image.open("button_needs-improvement.png"))
+        imgF = ImageTk.PhotoImage(Image.open("button_finish-session.png"))
+        imgH = ImageTk.PhotoImage(Image.open("button_home.png"))
         good = tk.Button(self, text = "Satisfactory", command = lambda: changeInput(True),image = imgS)
         improve = tk.Button(self, text = "Needs Improvement", command = lambda: changeInput(False), image = imgN)
         finish = tk.Button(self, text = "Finish Session", command = lambda: generateReport(), image = imgF)
