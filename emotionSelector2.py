@@ -31,4 +31,4 @@ def randomEmotion():
     return reaction(emotion)
 
 
-randomEmotion()
+#randomEmotion() Uncomment to test

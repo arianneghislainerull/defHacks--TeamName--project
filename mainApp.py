@@ -4,6 +4,7 @@ from tkinter import font  as tkfont # python 3
 
 from PIL import ImageTk, Image
 from facedetection import *
+from emotionSelector2 import *
 
 
 class SampleApp(tk.Tk):
