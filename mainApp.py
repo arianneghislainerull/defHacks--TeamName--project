@@ -91,12 +91,12 @@ class StartPage(tk.Frame):
                 #print(emotion)
                 results = main(emotion) # Starts the face/emotion detection
                 time = results[0]
+                #print(time)
                 resultImage = results[1]
 
                 #TODO LIST:
                     #Display Image on the App
                     #Display a list of times after
-                    #Close camera after loop
                     #Fix logo display
 
                 count = count + 1

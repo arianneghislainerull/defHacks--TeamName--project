@@ -139,6 +139,8 @@ def detection(actual_emotion):
                     time = end - start
                     #print(time)
                     frame = cv2.cvtColor(grayscale,cv2.COLOR_GRAY2RGB)
+                    vc.release()
+                    cv2.destroyAllWindows()
                     return time, image
 
 
