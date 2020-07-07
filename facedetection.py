@@ -197,7 +197,7 @@ def main(actual_emotion):
     image = results[1]
     image.save("./Users_pictures/users-"+actual_emotion+"-photo.jpg","JPEG")
     #image.show()
-    return time , image
+    return time , image, True
 
 #main("Happy") # Runs whole script
 #Send a string with one of the emotions - to not have one emotion be tested

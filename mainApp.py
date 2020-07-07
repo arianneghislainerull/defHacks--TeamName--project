@@ -8,6 +8,7 @@ from facedetection import *
 from emotionSelector2 import *
 
 times = []
+videoCaptured = False
 
 class SampleApp(tk.Tk):
 
@@ -83,28 +84,7 @@ class StartPage(tk.Frame):
             controller.show_frame("PageTwo")
             os.system('emotionSelector2.py')
 
-            global times
 
-            # Start the backend
-            count = 0
-            while count < 1:
-                emotionStarter = randomEmotion()
-                # Randomly selects an emotion and returns a sound and image representing that emotion
-                image = emotionStarter[0]
-                emotion = emotionStarter[1]
-                #print(emotion)
-                results = main(emotion) # Starts the face/emotion detection
-                time = results[0]
-                times.append(time)
-                #print(time)
-                resultImage = results[1]
-
-                #TODO LIST:
-                    #Display Image on the App
-                    #Display a list of times after
-                    #Fix logo display
-
-                count = count + 1
 
         button3 = tk.Button(self, text="Emotion Selector", command=lambda: openEmo(),image = img3)
         button3.image = img3
@@ -140,15 +120,6 @@ class PageOne(tk.Frame):
             result.pack()
             return
 
-        global times
-
-        if not times:
-            displayTime = "Loading time"
-        else:
-            displayTime = times[0]
-
-        labelTime = tk.Label(self, text=displayTime, font=controller.title_font, bg = 'white')
-        labelTime.pack(side="top", fill="x", pady=10)
 
         global imgS, imgN, imgF, imgH
         imgS = ImageTk.PhotoImage(Image.open("Buttons/button_satisfactory.png"))
@@ -177,19 +148,37 @@ class PageTwo(tk.Frame):
                            command=lambda: controller.show_frame("StartPage"), image = imgH)
         button.pack()
 
-        global times
 
-        displayTime = StringVar()
-        displayTime.set("Loading Times")
 
-        labelTime = tk.Label(self, text=displayTime, font=controller.title_font, bg = 'white')
+        displayTime = DoubleVar()
+
+        # Start the backend
+        count = 0
+        while count < 1:
+            emotionStarter = randomEmotion()
+            # Randomly selects an emotion and returns a sound and image representing that emotion
+            image = emotionStarter[0]
+            emotion = emotionStarter[1]
+            #print(emotion)
+            results = main(emotion) # Starts the face/emotion detection
+            time = results[0]
+
+            times.append(time)
+            videoCaptured = results[2]
+            #print(time)
+            resultImage = results[1]
+
+            #TODO LIST:
+                #Display Image on the App
+                #Game runs on opening app
+                #Fix logo display
+
+            count = count + 1
+
+        displayTime.set(times[0])
+
+        labelTime = tk.Label(self, text=displayTime.get(), font=controller.title_font, bg = 'white')
         labelTime.pack(side="top", fill="x", pady=10)
-
-        if times:
-            displayTime.set(times[0])
-            self.update_idletasks()
-
-
 
 
 if __name__ == "__main__":
