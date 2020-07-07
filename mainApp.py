@@ -1,6 +1,7 @@
 import tkinter as tk
 import subprocess, os
 from tkinter import font  as tkfont # python 3
+from tkinter import *
 
 from PIL import ImageTk, Image
 from facedetection import *
@@ -177,13 +178,18 @@ class PageTwo(tk.Frame):
         button.pack()
 
         global times
-        if times:
-            displayTime = times[0]
-        else:
-            displayTime = "Loading"
+
+        displayTime = StringVar()
+        displayTime.set("Loading Times")
 
         labelTime = tk.Label(self, text=displayTime, font=controller.title_font, bg = 'white')
         labelTime.pack(side="top", fill="x", pady=10)
+
+        if times:
+            displayTime.set(times[0])
+            self.update_idletasks()
+
+
 
 
 if __name__ == "__main__":
