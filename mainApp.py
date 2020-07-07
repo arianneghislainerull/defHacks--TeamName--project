@@ -6,6 +6,7 @@ from PIL import ImageTk, Image
 from facedetection import *
 from emotionSelector2 import *
 
+times = []
 
 class SampleApp(tk.Tk):
 
@@ -81,6 +82,8 @@ class StartPage(tk.Frame):
             controller.show_frame("PageTwo")
             os.system('emotionSelector2.py')
 
+            global times
+
             # Start the backend
             count = 0
             while count < 1:
@@ -91,6 +94,7 @@ class StartPage(tk.Frame):
                 #print(emotion)
                 results = main(emotion) # Starts the face/emotion detection
                 time = results[0]
+                times.append(time)
                 #print(time)
                 resultImage = results[1]
 
@@ -135,6 +139,16 @@ class PageOne(tk.Frame):
             result.pack()
             return
 
+        global times
+
+        if not times:
+            displayTime = "Loading time"
+        else:
+            displayTime = times[0]
+
+        labelTime = tk.Label(self, text=displayTime, font=controller.title_font, bg = 'white')
+        labelTime.pack(side="top", fill="x", pady=10)
+
         global imgS, imgN, imgF, imgH
         imgS = ImageTk.PhotoImage(Image.open("Buttons/button_satisfactory.png"))
         imgN = ImageTk.PhotoImage(Image.open("Buttons/button_needs-improvement.png"))
@@ -161,6 +175,15 @@ class PageTwo(tk.Frame):
         button = tk.Button(self, text="Home",
                            command=lambda: controller.show_frame("StartPage"), image = imgH)
         button.pack()
+
+        global times
+        if times:
+            displayTime = times[0]
+        else:
+            displayTime = "Loading"
+
+        labelTime = tk.Label(self, text=displayTime, font=controller.title_font, bg = 'white')
+        labelTime.pack(side="top", fill="x", pady=10)
 
 
 if __name__ == "__main__":
