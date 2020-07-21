@@ -125,7 +125,9 @@ def detection(actual_emotion):
 
                 (x,y,w,h)= face_utils.rect_to_bb(rect) #Face coordinates
                 face = grayscale[y:y+h,x:x+w]
-
+                #print(face.shape[0])
+                #print(face.shape[1])
+                #try catch here to catch if a divide by zero exists?
                 face = zoom(face, (shape_x / face.shape[0],shape_y / face.shape[1]))
 
                 face = face.astype(np.float32)

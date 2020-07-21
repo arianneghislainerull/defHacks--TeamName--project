@@ -9,6 +9,8 @@ from emotionSelector2 import *
 
 times = []
 videoCaptured = False
+selfTime = None
+controllerTime = None
 
 class SampleApp(tk.Tk):
 
@@ -83,6 +85,32 @@ class StartPage(tk.Frame):
         def openEmo():
             controller.show_frame("PageTwo")
             os.system('emotionSelector2.py')
+            # Start the backend
+
+            global times, videoCaptured
+
+            count = 0
+            while count < 1:
+                emotionStarter = randomEmotion()
+                # Randomly selects an emotion and returns a sound and image representing that emotion
+                image = emotionStarter[0]
+                emotion = emotionStarter[1]
+                #print(emotion)
+                results = main(emotion) # Starts the face/emotion detection
+                time = results[0]
+
+                times.append(time)
+                videoCaptured = results[2]
+                #print(time)
+                resultImage = results[1]
+
+                #TODO LIST:
+                    #Display Image on the App
+                    #Game runs on opening app
+                    #Fix logo display
+
+                count = count + 1
+
 
 
 
@@ -149,38 +177,37 @@ class PageTwo(tk.Frame):
         button.pack()
 
 
+        global selfTime
+        global controllerTime
 
-        displayTime = DoubleVar()
+        selfTime = self
+        controllerTime = controller
 
-        # Start the backend
-        count = 0
-        while count < 1:
-            emotionStarter = randomEmotion()
-            # Randomly selects an emotion and returns a sound and image representing that emotion
-            image = emotionStarter[0]
-            emotion = emotionStarter[1]
-            #print(emotion)
-            results = main(emotion) # Starts the face/emotion detection
-            time = results[0]
+def time(self, controller):
+    global times
 
-            times.append(time)
-            videoCaptured = results[2]
-            #print(time)
-            resultImage = results[1]
+    displayTime = DoubleVar()
 
-            #TODO LIST:
-                #Display Image on the App
-                #Game runs on opening app
-                #Fix logo display
-
-            count = count + 1
-
+    if not times:
+        displayTime.set(2.0)
+    else:
         displayTime.set(times[0])
+    #print(displayTime.get())
+    #print(type(displayTime.get()))
+    labelTime = tk.Label(self, text=displayTime.get(), font=controller.title_font, bg = 'white')
+    labelTime.pack(side="top", fill="x", pady=10)
+    labelTime.update_idletasks()
 
-        labelTime = tk.Label(self, text=displayTime.get(), font=controller.title_font, bg = 'white')
-        labelTime.pack(side="top", fill="x", pady=10)
+
 
 
 if __name__ == "__main__":
     app = SampleApp()
+    while True:
+        app.update_idletasks()
+        app.update()
+        if times:
+            time(selfTime, controllerTime)
+            break
+
     app.mainloop()
