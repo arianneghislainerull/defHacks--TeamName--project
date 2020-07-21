@@ -7,6 +7,8 @@ from PIL import ImageTk, Image
 from facedetection import *
 from emotionSelector2 import *
 
+from playsound import playsound
+
 times = []
 videoCaptured = False
 selfTime = None
@@ -93,9 +95,17 @@ class StartPage(tk.Frame):
             while count < 1:
                 emotionStarter = randomEmotion()
                 # Randomly selects an emotion and returns a sound and image representing that emotion
-                image = emotionStarter[0]
+                reactionTuple = emotionStarter[0]
+                image = reactionTuple[0]
+                sound = reactionTuple[1]
+
+                #Return the soundpath for emotion and play here too?
                 emotion = emotionStarter[1]
                 #print(emotion)
+
+                image.show()
+                playsound(sound)
+
                 results = main(emotion) # Starts the face/emotion detection
                 time = results[0]
 

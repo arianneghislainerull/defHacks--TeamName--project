@@ -20,9 +20,9 @@ def reaction(emotion):
     image = Image.open(Path(thepath(emotion)))
     #resize Image
     image = image.resize((512,512))
-    image.show()
-    playsound(soundpath(emotion))
-    return image
+    #image.show()
+    #playsound(soundpath(emotion))
+    return image , soundpath(emotion)
 
 def randomEmotion():
     #choose randomly from all emotions
