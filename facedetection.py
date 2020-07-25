@@ -13,6 +13,7 @@ import imutils
 from scipy import ndimage
 import dlib
 from time import process_time
+from playsound import playsound
 
 
 cascade_face = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -24,7 +25,7 @@ global shape_y
 global input_shape
 global nClasses
 
-def detection(actual_emotion):
+def detection(actual_emotion,soundList,emotionImageList):
     shape_x = 48
     shape_y = 48
     input_shape = (shape_x, shape_y, 1)
@@ -107,8 +108,19 @@ def detection(actual_emotion):
     skip_frame = True
 
     #Call function in loop and get it to output guess
+    emotionImageList[0].show()
+    playsound(soundList[0])
+    counter = 0
+    counterCheck = False
+
+    times = []
+    images = []
 
     while True:
+        if counterCheck:
+            counterCheck = False
+            playsound(soundList[counter])
+            emotionImageList[counter].show()
         _, img = vc.read()
         image = img[:]
 
@@ -136,14 +148,22 @@ def detection(actual_emotion):
                 face = np.reshape(face.flatten(), (1,48,48,1))
 
                 emotion_prediction = emotionPrediction(face,model)
-                if(emotion_prediction == actual_emotion):
+                if(emotion_prediction == actual_emotion[counter]):
                     end = process_time()
                     time = end - start
+                    times.append(time)
+                    counterCheck = True
+
                     #print(time)
                     frame = cv2.cvtColor(grayscale,cv2.COLOR_GRAY2RGB)
-                    vc.release()
-                    cv2.destroyAllWindows()
-                    return time, image
+                    #vc.release()
+                    #cv2.destroyAllWindows()
+                    images.append(image)
+                    counter = counter + 1
+                    if counter == len(actual_emotion):
+                        vc.release()
+                        cv2.destroyAllWindows()
+                        return times, images
 
 
 
@@ -153,8 +173,8 @@ def detection(actual_emotion):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    vc.release()
-    cv2.destroyAllWindows()
+    #vc.release()
+    #cv2.destroyAllWindows()
 
 
 def emotionPrediction(face,model):
@@ -182,24 +202,24 @@ def predictionDecipher(model_guess):
     sad_metric = str(round(model_guess[0][4],3)) #sad
     surprise_metric = str(round(model_guess[0][5],3)) #surprise
     neutral_metric = str(round(model_guess[0][6],3)) #neutral
-    #print("Anger:"+anger_metric)
-    #print("Disgust:"+disgust_metric)
-    #print("Fear:"+fear_metric)
-    #print("Happy:"+happy_metric)
-    #print("Sad:"+sad_metric)
-    #print("Surprise:"+surprise_metric)
-    #print("Neutral:"+neutral_metric)
 
-def main(actual_emotion):
-    results = detection(actual_emotion) # returns true when user's emotion matches actual_emotion
 
-    time = results[0]
+def main(actual_emotion,soundList,emotionImageList):
+    results = detection(actual_emotion,soundList,emotionImageList) # returns true when user's emotion matches actual_emotion
+
+    time_list = results[0]
 
     #image = Image.fromarray(results[1], 'RGB')
-    image = results[1]
-    image.save("./Users_pictures/users-"+actual_emotion+"-photo.jpg","JPEG")
+    image_list = results[1]
+    #Loop through image list to save them
+    count = 0
+    for img in image_list:
+        img.show()
+        img.save("./Users_pictures/users-"+actual_emotion[0]+"-photo.jpg","JPEG")
+        count = count + 1
     #image.show()
-    return time , image, True
+    print(time_list)
+    return time_list , image_list, True
 
 #main("Happy") # Runs whole script
 #Send a string with one of the emotions - to not have one emotion be tested

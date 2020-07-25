@@ -14,6 +14,9 @@ videoCaptured = False
 selfTime = None
 controllerTime = None
 emotionString = ""
+emotionList = []
+soundList = []
+emotionImageList = []
 
 class SampleApp(tk.Tk):
 
@@ -97,22 +100,22 @@ class StartPage(tk.Frame):
                 emotionStarter = randomEmotion()
                 # Randomly selects an emotion and returns a sound and image representing that emotion
                 reactionTuple = emotionStarter[0]
-                image = reactionTuple[0]
-                sound = reactionTuple[1]
-
+                emotionImageList.append(reactionTuple[0])
+                soundList.append(reactionTuple[1])
+                emotionList.append(emotionStarter[1])
                 emotionString = emotionStarter[1]
                 #print(emotion)
+                count = count + 1
+                #image.show()
+                #playsound(sound)
+            #print(emotionList)
+            results = main(emotionList,soundList,emotionImageList) # Starts the face/emotion detection
+            times = results[0]
 
-                image.show()
-                playsound(sound)
 
-                results = main(emotionString) # Starts the face/emotion detection
-                time = results[0]
-
-                times.append(time)
-                videoCaptured = results[2]
+            videoCaptured = results[2]
                 #print(time)
-                resultImage = results[1]
+            resultImage = results[1]
 
                 #TODO LIST:
                     #Rewrite main() function to take a list of emotions
@@ -121,7 +124,7 @@ class StartPage(tk.Frame):
                     #Display and rewrite images on tikinter window
                     #Fix logo display
 
-                count = count + 1
+
 
 
 
