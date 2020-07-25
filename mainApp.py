@@ -13,6 +13,7 @@ times = []
 videoCaptured = False
 selfTime = None
 controllerTime = None
+emotionString = ""
 
 class SampleApp(tk.Tk):
 
@@ -89,24 +90,23 @@ class StartPage(tk.Frame):
             os.system('emotionSelector2.py')
             # Start the backend
 
-            global times, videoCaptured
+            global times, videoCaptured, emotionString
 
             count = 0
-            while count < 1:
+            while count < 5:
                 emotionStarter = randomEmotion()
                 # Randomly selects an emotion and returns a sound and image representing that emotion
                 reactionTuple = emotionStarter[0]
                 image = reactionTuple[0]
                 sound = reactionTuple[1]
 
-                #Return the soundpath for emotion and play here too?
-                emotion = emotionStarter[1]
+                emotionString = emotionStarter[1]
                 #print(emotion)
 
                 image.show()
                 playsound(sound)
 
-                results = main(emotion) # Starts the face/emotion detection
+                results = main(emotionString) # Starts the face/emotion detection
                 time = results[0]
 
                 times.append(time)
@@ -115,8 +115,10 @@ class StartPage(tk.Frame):
                 resultImage = results[1]
 
                 #TODO LIST:
-                    #Display Image on the App
-                    #Game runs on opening app
+                    #Rewrite main() function to take a list of emotions
+                        #this prevents stopping and starting of face recognition
+                        #Take in the sound and play it as well?
+                    #Display and rewrite images on tikinter window
                     #Fix logo display
 
                 count = count + 1
@@ -204,7 +206,10 @@ def time(self, controller):
         displayTime.set(times[0])
     #print(displayTime.get())
     #print(type(displayTime.get()))
-    labelTime = tk.Label(self, text=displayTime.get(), font=controller.title_font, bg = 'white')
+
+    displayText = emotionString + ": " + str(displayTime.get())
+
+    labelTime = tk.Label(self, text=displayText, font=controller.title_font, bg = 'white')
     labelTime.pack(side="top", fill="x", pady=10)
     labelTime.update_idletasks()
 
