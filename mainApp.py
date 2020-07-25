@@ -118,9 +118,7 @@ class StartPage(tk.Frame):
             resultImage = results[1]
 
                 #TODO LIST:
-                    #Rewrite main() function to take a list of emotions
-                        #this prevents stopping and starting of face recognition
-                        #Take in the sound and play it as well?
+
                     #Display and rewrite images on tikinter window
                     #Fix logo display
 
