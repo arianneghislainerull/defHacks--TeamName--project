@@ -210,7 +210,12 @@ def time(self, controller):
     #print(displayTime.get())
     #print(type(displayTime.get()))
 
-    displayText = emotionString + ": " + str(displayTime.get())
+    displayText = ""
+    count = 0
+    for emotion in emotionList:
+        displayTime.set(times[count])
+        displayText = displayText + emotion + ": " + str(displayTime.get()) + " seconds.\n"
+        count = count + 1
 
     labelTime = tk.Label(self, text=displayText, font=controller.title_font, bg = 'white')
     labelTime.pack(side="top", fill="x", pady=10)

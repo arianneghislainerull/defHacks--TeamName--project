@@ -214,12 +214,22 @@ def main(actual_emotion,soundList,emotionImageList):
     #Loop through image list to save them
     count = 0
     for img in image_list:
-        img.show()
+        #img.show()
         img.save("./Users_pictures/users-"+actual_emotion[0]+"-photo.jpg","JPEG")
         count = count + 1
     #image.show()
+    t = time_list[0]
+    correct_time_list = []
+    correct_time_list.append(t)
+    for time in time_list:
+        if time == t:
+            continue
+        temp = time - t
+        correct_time_list.append(temp)
+        t = time
     print(time_list)
-    return time_list , image_list, True
+    print(correct_time_list)
+    return correct_time_list , image_list, True
 
 #main("Happy") # Runs whole script
 #Send a string with one of the emotions - to not have one emotion be tested
