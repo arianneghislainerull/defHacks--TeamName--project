@@ -118,9 +118,8 @@ class StartPage(tk.Frame):
             resultImage = results[1]
 
                 #TODO LIST:
-
-                    #Display and rewrite images on tikinter window
-                    #Fix logo display
+                    #Display and rewrite images on tikinter window (not sure this possible)
+                    #Fix logo display on main screen
 
 
 
