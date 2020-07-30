@@ -161,6 +161,7 @@ def detection(actual_emotion,soundList,emotionImageList):
                     images.append(image)
                     counter = counter + 1
                     if counter == len(actual_emotion):
+                        counter = 0
                         vc.release()
                         cv2.destroyAllWindows()
                         return times, images

@@ -26,7 +26,7 @@ def reaction(emotion):
 
 def randomEmotion():
     #choose randomly from all emotions
-    list = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise"]
+    list = ["Angry", "Disgust", "Happy", "Sad", "Surprise"]
     emotion = random.choice(list)
     return reaction(emotion) , emotion
 
