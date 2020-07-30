@@ -71,13 +71,21 @@ class StartPage(tk.Frame):
 
 
 
-        global img,img2,img3
+        global img,img2,img3,appImg
         img = ImageTk.PhotoImage(Image.open("Buttons/buttonManual.png"))  # make sure to add "/" not "\"
         img2 = ImageTk.PhotoImage(Image.open("Buttons/btnHW.png"))  # make sure to add "/" not "\"
         img3 = ImageTk.PhotoImage(Image.open("Buttons/btnEmo.png"))  # make sure to add "/" not "\"
+        appImg = ImageTk.PhotoImage(Image.open("Content/TherAssist-resized.png"))
+
+        logo = Label(self, image = appImg, justify = "top")
+        logo.pack()
+
         button1 = tk.Button(self, text="Manual",
                             command=lambda: controller.show_frame("PageOne"), image = img)
         button1.image = img
+
+
+
 
         def openHw():
             controller.show_frame("PageTwo")
@@ -126,10 +134,10 @@ class StartPage(tk.Frame):
 
 
 
-        button3 = tk.Button(self, text="Emotion Selector", command=lambda: openEmo(),image = img3)
+        button3 = tk.Button(self, text="Emotion Selector", command=lambda: openEmo(),image = img3, pady = 1000)
         button3.image = img3
-        button1.pack()
-        button2.pack()
+        #button1.pack()
+        #button2.pack()
         button3.pack()
 
 
