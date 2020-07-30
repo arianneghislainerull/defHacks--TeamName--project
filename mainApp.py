@@ -77,7 +77,7 @@ class StartPage(tk.Frame):
         img3 = ImageTk.PhotoImage(Image.open("Buttons/btnEmo.png"))  # make sure to add "/" not "\"
         appImg = ImageTk.PhotoImage(Image.open("Content/TherAssist-resized.png"))
 
-        logo = Label(self, image = appImg, justify = "top")
+        logo = Label(self, image = appImg)
         logo.pack()
 
         button1 = tk.Button(self, text="Manual",
@@ -134,7 +134,7 @@ class StartPage(tk.Frame):
 
 
 
-        button3 = tk.Button(self, text="Emotion Selector", command=lambda: openEmo(),image = img3, pady = 1000)
+        button3 = tk.Button(self, text="Emotion Selector", command=lambda: openEmo(),image = img3)
         button3.image = img3
         #button1.pack()
         #button2.pack()
