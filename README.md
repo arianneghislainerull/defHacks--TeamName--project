@@ -2,6 +2,8 @@
 
 [DevPost](https://devpost.com/software/healtherapist)
 
+[Youtube Demo](https://youtu.be/smWooWXbKfM)
+
 ## Inspiration
 While we were researching potential hackathon ideas, one of our fellow lovely members stated that people who suffer from Bell’s Palsy may undergo functional electrical stimulation (FES) treatment to enable the patient to feel and move their facial muscles. These people as well are usually given physical therapy exercises to try and move their muscles on their own by physically moving their faces into different emotional states.
 
@@ -19,7 +21,7 @@ Introducing TherAssist! It is a web app that can be used by occupational therapi
 - Further, implementing machine learning into our project was something that stopped us in our tracks. We weren't quite sure how to get started or where to even look, but we pushed through and were able to create something that excited us.
 
 ## Accomplishments that we're proud of
-- Completing a project that is really applicable and solves real world problem 
+- Completing a project that is really applicable and solves real world problem
 - Learning about building apps in python
 - Learning about computer vision
 - Learning about machine learning and creating a working app that uses trained models
